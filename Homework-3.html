@@ -168,39 +168,19 @@ pre code {
 </div>
 
 
+<pre class="r"><code>library(&#39;tidyverse&#39;)</code></pre>
 <div id="using-github" class="section level1">
 <h1>1. Using Github</h1>
 <p>The repository can be accessed at X.</p>
 </div>
 <div id="stroop-standing-up-or-sitting-down" class="section level1">
 <h1>2. Stroop, Standing Up or Sitting Down</h1>
-<pre class="r"><code>#Loading in the Stroop data.
-stroopdata &lt;- read.csv(&#39;stroop_standing_data.csv&#39;) 
-summary (stroopdata)</code></pre>
-<pre><code>##     subject           age           gender            condition    
-##  Min.   :  1.0   Min.   :17.00   Length:32121       Min.   :1.000  
-##  1st Qu.: 31.0   1st Qu.:18.00   Class :character   1st Qu.:1.000  
-##  Median : 62.0   Median :20.00   Mode  :character   Median :2.000  
-##  Mean   : 61.6   Mean   :20.14                      Mean   :1.508  
-##  3rd Qu.: 92.0   3rd Qu.:21.00                      3rd Qu.:2.000  
-##  Max.   :122.0   Max.   :35.00                      Max.   :2.000  
-##                                                                    
-##     phase               trial          stimulus          congruency       
-##  Length:32121       Min.   :  0.00   Length:32121       Length:32121      
-##  Class :character   1st Qu.: 22.00   Class :character   Class :character  
-##  Mode  :character   Median : 44.00   Mode  :character   Mode  :character  
-##                     Mean   : 48.11                                        
-##                     3rd Qu.: 75.00                                        
-##                     Max.   :107.00                                        
-##                                                                           
-##       rt               correct              X        
-##  Length:32121       Min.   :   0.00   Min.   :1      
-##  Class :character   1st Qu.:   1.00   1st Qu.:1      
-##  Mode  :character   Median :   1.00   Median :1      
-##                     Mean   :  77.96   Mean   :1      
-##                     3rd Qu.:   1.00   3rd Qu.:1      
-##                     Max.   :1249.00   Max.   :1      
-##                     NA&#39;s   :298       NA&#39;s   :32114</code></pre>
+<pre class="r"><code># Loading in the Stroop data.
+stroopdata &lt;- read.csv(&#39;stroop_standing_data.csv&#39;)</code></pre>
+<pre class="r"><code># I am cleaning the data by first removing the mistrials and then removing the practice phase trials. I am choosing to do this as the mistrial data will be incorrect and the practice trials are there to allow the participant to understand the task before the real trials begin..
+stroopdataclean &lt;- stroopdata %&gt;% 
+  filter(correct != 999) %&gt;% 
+  filter(phase != &#39;practice&#39;)</code></pre>
 </div>
 
 

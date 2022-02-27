@@ -2,6 +2,10 @@
 title: "Homework 3"
 output: html_document
 ---
+```{r loadtidyverse, results = FALSE, message=FALSE}
+library('tidyverse')
+
+```
 
 # 1. Using Github
 
@@ -9,11 +13,17 @@ The repository can be accessed at X.
 
 # 2. Stroop, Standing Up or Sitting Down
 
-```{r loadingdata}
+```{r loadingdata, results='hide'}
 
-#Loading in the Stroop data.
-stroopdata <- read.csv('stroop_standing_data.csv') 
-summary (stroopdata)
+# Loading in the Stroop data.
+stroopdata <- read.csv('stroop_standing_data.csv')
 
 ```
 
+```{r datacleaning}
+# I am cleaning the data by first removing the mistrials and then removing the practice phase trials. I am choosing to do this as the mistrial data will be incorrect and the practice trials are there to allow the participant to understand the task before the real trials begin..
+stroopdataclean <- stroopdata %>% 
+  filter(correct != 999) %>% 
+  filter(phase != 'practice')
+
+```
