@@ -5,6 +5,15 @@ output: html_document
 
 # 1. Using Github
 
-The respository can be accessed at X.
+The repository can be accessed at X.
 
 # 2. Stroop, Standing Up or Sitting Down
+
+```{r loadingdata}
+
+#Loading in the Stroop data.
+stroopdata <- read.csv('stroop_standing_data.csv') 
+summary (stroopdata)
+
+```
+
