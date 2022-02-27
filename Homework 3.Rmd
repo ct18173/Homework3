@@ -1,0 +1,10 @@
+---
+title: "Homework 3"
+output: html_document
+---
+
+# 1. Using Github
+
+The respository can be accessed at X.
+
+# 2. Stroop, Standing Up or Sitting Down
