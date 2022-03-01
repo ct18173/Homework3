@@ -2,8 +2,9 @@
 title: "Homework 3"
 output: html_document
 ---
-```{r loadtidyverse, results = FALSE, message=FALSE}
+```{r loadpackages, results = FALSE, message=FALSE}
 library('tidyverse')
+library('lme4')
 
 ```
 
@@ -21,9 +22,19 @@ stroopdata <- read.csv('stroop_standing_data.csv')
 ```
 
 ```{r datacleaning}
-# I am cleaning the data by first removing the mistrials and then removing the practice phase trials. I am choosing to do this as the mistrial data will be incorrect and the practice trials are there to allow the participant to understand the task before the real trials begin..
+# I am cleaning the data by first removing the mistrials and then removing the practice phase trials. I am choosing to do this as the mistrial data will be incorrect and the practice trials are there to allow the participant to understand the task before the real trials begin.
 stroopdataclean <- stroopdata %>% 
   filter(correct != 999) %>% 
-  filter(phase != 'practice')
+  filter(phase != 'practice') %>%
+  filter(congruency != 'baseline') %>%
+  pivot_wider(names_from = subject, values_from = rt)
+  
+stroopdatanew <- tibble(
+congruent = congruent_data$rt,
+incongruent = incongruent_data$rt,
+diff = incongruent - congruent)
 
 ```
+
+```{r fitmodel}
+stroopdatamodel <- lmer(phase ~ rt + (1|congruency), stroopdataclean)
