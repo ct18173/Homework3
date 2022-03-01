@@ -5,12 +5,13 @@ output: html_document
 ```{r loadpackages, results = FALSE, message=FALSE}
 library('tidyverse')
 library('lme4')
+library('factoextra')
 
 ```
 
 # 1. Using Github
 
-The repository can be accessed at X.
+The repository can be accessed at https://ct18173.github.io/homework3/.
 
 # 2. Stroop, Standing Up or Sitting Down
 
@@ -26,15 +27,32 @@ stroopdata <- read.csv('stroop_standing_data.csv')
 stroopdataclean <- stroopdata %>% 
   filter(correct != 999) %>% 
   filter(phase != 'practice') %>%
-  filter(congruency != 'baseline') %>%
-  pivot_wider(names_from = subject, values_from = rt)
+  filter(congruency != 'baseline')
   
-stroopdatanew <- tibble(
-congruent = congruent_data$rt,
-incongruent = incongruent_data$rt,
-diff = incongruent - congruent)
+widestroopdata <- pivot_wider(stroopdataclean, names_from = phase, values_from = rt)
+
+mean(stroopdataclean[stroopdataclean$congruency == 'congruent', 'rt']) #find out how to get mean
 
 ```
 
 ```{r fitmodel}
-stroopdatamodel <- lmer(phase ~ rt + (1|congruency), stroopdataclean)
+ #not working yet
+
+```
+
+# 3. The Dimensions of Popular Music
+
+```{r loadingmusicdata, results='hide'}
+
+# Loading in the Stroop data.
+spotifydata <- read.csv('spotify_cleaned.csv')
+
+```
+
+```{r PCA}
+
+pcaspotifydata <- select(spotifydata, -X, -Track.Name, -Artist, -Streams, -time_signature)
+pcaspotifydata2 <- prcomp(pcaspotifydata)
+summary(pcaspotifydata2)
+
+factoextra::fviz_eig(pcaspotifydata2)
