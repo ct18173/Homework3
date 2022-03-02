@@ -28,10 +28,14 @@ stroopdataclean <- stroopdata %>%
   filter(correct != 999) %>% 
   filter(phase != 'practice') %>%
   filter(congruency != 'baseline')
-  
-widestroopdata <- pivot_wider(stroopdataclean, names_from = phase, values_from = rt)
 
-mean(stroopdataclean[stroopdataclean$congruency == 'congruent', 'rt']) #find out how to get mean
+stroopdataclean$rt <- as.numeric(stroopdataclean$rt)
+
+stroopdataclean$subject <- factor(stroopdataclean$subject)
+stroopdataclean$congruency <- factor(stroopdataclean$congruency)
+
+groupstroop <- group_by(stroopdataclean, subject, congruency)
+summarisestroop <- summarise(groupstroop, mean(rt))
 
 ```
 
@@ -56,3 +60,11 @@ pcaspotifydata2 <- prcomp(pcaspotifydata)
 summary(pcaspotifydata2)
 
 factoextra::fviz_eig(pcaspotifydata2)
+
+fviz_pca_var(pcaspotifydata2)
+
+cor(pcaspotifydata2)
+
+pcaspotifydata3 <- prcomp(pcaspotifydata2, scale = TRUE)
+summary(pcaspotifydata3)
+factoextra::fviz_eig(pcaspotifydata3)
