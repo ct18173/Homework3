@@ -37,6 +37,14 @@ stroopdataclean$congruency <- factor(stroopdataclean$congruency)
 groupstroop <- group_by(stroopdataclean, subject, congruency)
 summarisestroop <- summarise(groupstroop, mean(rt))
 
+widestroopdata <- pivot_wider(summarisestroop, names_from = congruency, values_from = 'mean(rt)')
+
+stroopnona <- drop_na(widestroopdata)
+
+stroopdatafinal <- mutate(stroopnona, stroopeffect = congruent-incongruent)
+
+lm(stroopeffect ~ phase, stroopdatafinal)
+
 ```
 
 ```{r fitmodel}
