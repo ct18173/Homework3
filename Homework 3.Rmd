@@ -25,25 +25,31 @@ stroopdata <- read.csv('stroop_standing_data.csv')
 ```{r datacleaning}
 # I am cleaning the data by first removing the mistrials and then removing the practice phase trials. I am choosing to do this as the mistrial data will be incorrect and the practice trials are there to allow the participant to understand the task before the real trials begin.
 stroopdataclean <- stroopdata %>% 
+  select(subject, age, gender, condition, phase, trial, stimulus, congruency, rt, correct) %>%
   filter(correct != 999) %>% 
   filter(phase != 'practice') %>%
-  filter(congruency != 'baseline')
+  filter(congruency != 'baseline') %>%
+  mutate(rt = as.numeric(rt))
 
 stroopdataclean$rt <- as.numeric(stroopdataclean$rt)
 
-stroopdataclean$subject <- factor(stroopdataclean$subject)
-stroopdataclean$congruency <- factor(stroopdataclean$congruency)
+stroopnona <- drop_na(stroopdataclean)
 
-groupstroop <- group_by(stroopdataclean, subject, congruency)
-summarisestroop <- summarise(groupstroop, mean(rt))
+stroopnona$subject <- factor(stroopnona$subject)
+stroopnona$congruency <- factor(stroopnona$congruency)
 
-widestroopdata <- pivot_wider(summarisestroop, names_from = congruency, values_from = 'mean(rt)')
+groupstroop <- group_by(stroopnona, subject, congruency, phase)
+summarisestroop <- summarise(groupstroop, mean_rt = mean(rt))
 
-stroopnona <- drop_na(widestroopdata)
+widestroopdata <- pivot_wider(summarisestroop, names_from = congruency, values_from = 'mean_rt')
 
-stroopdatafinal <- mutate(stroopnona, stroopeffect = congruent-incongruent)
+stroopdatafinal <- mutate(widestroopdata, stroopeffect = incongruent-congruent)
 
-lm(stroopeffect ~ phase, stroopdatafinal)
+stroopdatamodel <- lmer(stroopeffect ~ phase + (1|subject), stroopdatafinal)
+
+stroopdataplot <- ggplot(stroopdatafinal, aes(phase, stroopeffect)) + geom_col()
+
+ggplot(stroopdatafinal, aes(phase, stroopeffect, fill = factor(phase))) + geom_boxplot() + geom_jitter(alpha = 0.5)
 
 ```
 
