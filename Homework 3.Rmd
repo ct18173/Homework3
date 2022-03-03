@@ -110,12 +110,18 @@ factoextra::fviz_eig(pcaspotifydata)
 
 ```
 
+### From the findings I interpret that the first two prinicple components contribute the most to the variance in pop music. Principle components 3-8 have a very very small amount of contribution to the variance, and principle components 9-12 have no contribution.
+
+### The plot below shows that tempo and duration are the main contributing factors to the variance in pop music. This plot is an improvement of the plot shwon in the article as you can see clearer here that both components 1 and 2 are orthoganal, and therefore uncorrelated. This is less clear in the scatter plot.
+
 ```{r pcaplot}
 
 pcaplot <- fviz_pca_var(pcaspotifydata)
 pcaplot
 
 ```
+
+### These two plots show that duration makes up almost 100% of principal component 1 and tempo almost 100% of prinicpal component two.
 
 ```{r contributions}
 
@@ -127,10 +133,4 @@ contrib2
 
 ```
 
-fviz_pca_var(pcaspotifydata2)
-
-cor(pcaspotifydata2)
-
-pcaspotifydata3 <- prcomp(pcaspotifydata2, scale = TRUE)
-summary(pcaspotifydata3)
-factoextra::fviz_eig(pcaspotifydata3)
+### My conclusion is that most of the variance in pop music can be explained by song duration and tempo. This means that the pop music analysed probably sounds very similar as the other dimensions did not explain much of the variance.
