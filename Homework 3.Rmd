@@ -2,78 +2,130 @@
 title: "Homework 3"
 output: html_document
 ---
-```{r loadpackages, results = FALSE, message=FALSE}
+
+```{r loadlibraries, echo=FALSE, message=FALSE, results='hide'}
 library('tidyverse')
 library('lme4')
 library('factoextra')
 
 ```
 
-# 1. Using Github
+## 1. Using Github
 
 The repository can be accessed at https://ct18173.github.io/homework3/.
 
-# 2. Stroop, Standing Up or Sitting Down
+## 2. Stroop, Standing Up or Sitting Down
+
+### Loading in the Stroop data.
 
 ```{r loadingdata, results='hide'}
 
-# Loading in the Stroop data.
 stroopdata <- read.csv('stroop_standing_data.csv')
 
 ```
 
-```{r datacleaning}
-# I am cleaning the data by first removing the mistrials and then removing the practice phase trials. I am choosing to do this as the mistrial data will be incorrect and the practice trials are there to allow the participant to understand the task before the real trials begin.
+### I am cleaning the data by first removing the mistrials and incorrect trials, and then removing the practice phase trials. Then, I removed the baseline data. Then I changed the data type for rt from character to numeric.
+
+```{r datacleaning, warning=FALSE}
 stroopdataclean <- stroopdata %>% 
   select(subject, age, gender, condition, phase, trial, stimulus, congruency, rt, correct) %>%
-  filter(correct != 999) %>% 
+  drop_na() %>%
+  filter(correct != 999) %>%
+  filter(correct != 0) %>%
   filter(phase != 'practice') %>%
   filter(congruency != 'baseline') %>%
   mutate(rt = as.numeric(rt))
+```
 
-stroopdataclean$rt <- as.numeric(stroopdataclean$rt)
+### Summarising the data to create a mean reaction time to see how this the reaction time differed across different phases (sitting vs standing) and congruency (congruent vs incongruent).
 
-stroopnona <- drop_na(stroopdataclean)
+```{r preprocessing - summary, message=FALSE}
 
-stroopnona$subject <- factor(stroopnona$subject)
-stroopnona$congruency <- factor(stroopnona$congruency)
-
-groupstroop <- group_by(stroopnona, subject, congruency, phase)
-summarisestroop <- summarise(groupstroop, mean_rt = mean(rt))
-
-widestroopdata <- pivot_wider(summarisestroop, names_from = congruency, values_from = 'mean_rt')
-
-stroopdatafinal <- mutate(widestroopdata, stroopeffect = incongruent-congruent)
-
-stroopdatamodel <- lmer(stroopeffect ~ phase + (1|subject), stroopdatafinal)
-
-stroopdataplot <- ggplot(stroopdatafinal, aes(phase, stroopeffect)) + geom_col()
-
-ggplot(stroopdatafinal, aes(phase, stroopeffect, fill = factor(phase))) + geom_boxplot() + geom_jitter(alpha = 0.5)
+stroopdataclean <- group_by(stroopdataclean, subject, congruency, phase)
+stroopdataclean <- summarise(stroopdataclean, mean_rt = mean(rt))
 
 ```
 
-```{r fitmodel}
- #not working yet
+### Pivoting the data so that congruent and incongruent data from each subject can be easily compared.
+
+```{r preprocessing - pivot}
+
+stroopdataclean <- pivot_wider(stroopdataclean, names_from = congruency, values_from = 'mean_rt')
+head(stroopdataclean)
 
 ```
 
-# 3. The Dimensions of Popular Music
+### Adding a new variable which calculates 'Stroop Effect' which is the difference between the incongruent and congruent conditions.
+
+``` {r preprocessing - stroopeffectvariable}
+stroopdataclean <- mutate(stroopdataclean, stroopeffect = incongruent-congruent)
+head(stroopdataclean)
+
+```
+
+### Fitting a mixed effects model to the data. Subject is the random effect.
+
+``` {r stroopmodel, warning=FALSE}
+
+stroopdatamodel <- lmer(stroopeffect ~ phase + (1|subject), stroopdataclean)
+summary(stroopdatamodel)
+
+```
+
+### Creating a box plot to show the data.
+
+```{r stroopplot, echo=FALSE, warning=FALSE}
+
+ggplot(stroopdataclean, aes(phase, stroopeffect)) + geom_boxplot() + geom_jitter(alpha = 0.5) + ylab('Stroop Effect') + xlab('Phase')
+
+```
+
+### This study found the opposite to what the original Stroop experiment showed. This experiment found that participants showed a slightly smaller Stroop effect when sitting. This result was significant, but not to a large extent as the t-value is still very small which indicates less difference between the conditions.
+
+## 3. The Dimensions of Popular Music
+
+### Loading in the Spotify data.
 
 ```{r loadingmusicdata, results='hide'}
 
-# Loading in the Stroop data.
 spotifydata <- read.csv('spotify_cleaned.csv')
 
 ```
 
+### I removed the data that related to things other than the components I wanted to look at in the data. Then I conducted a PCA on the data.
+
 ```{r PCA}
 
 pcaspotifydata <- select(spotifydata, -X, -Track.Name, -Artist, -Streams, -time_signature)
-pcaspotifydata2 <- prcomp(pcaspotifydata)
-summary(pcaspotifydata2)
+pcaspotifydata <- prcomp(pcaspotifydata)
+summary(pcaspotifydata)
 
-factoextra::fviz_eig(pcaspotifydata2)
+```
+
+### This data replicates the previous PCA results as I have found that the first two principal components also account for 99% of the variance. This can also been shown in the Scree plot below.
+
+```{r screeplot, echo=FALSE}
+
+factoextra::fviz_eig(pcaspotifydata)
+
+```
+
+```{r pcaplot}
+
+pcaplot <- fviz_pca_var(pcaspotifydata)
+pcaplot
+
+```
+
+```{r contributions}
+
+contrib1 <- fviz_contrib(pcaspotifydata, choice="var", axes = 1)
+contrib1
+
+contrib2 <- fviz_contrib(pcaspotifydata, choice="var", axes = 2)
+contrib2
+
+```
 
 fviz_pca_var(pcaspotifydata2)
 
